@@ -1,23 +1,23 @@
 model{
         for(s in 1:NSubjects) {
                 for(t in TrialStart:TrialEnd) {
-                    xmu[t,s] <- A[s] * x[t , s] - v[t,s] * B[s] * u[t,s]
-                    x[t+1,s] ~ dnorm(xmu[t,s], q[s])
-                    y[t,s] ~ dnorm(x[t, s], r[s])
-                    u[t,s] <- y[t,s] + p[t,s];
+                    xmu[t,s] <- A[s] * x[t , s] - v[t,s] * B[s] * e[t,s] # Equation for the aiming angle
+                    x[t+1,s] ~ dnorm(xmu[t,s], etaprec[s]) # Aiming angle plus noise
+                    y[t,s] ~ dnorm(x[t, s], epsilonprec[s]) # Equation for the movement angle
+                    e[t,s] <- y[t,s] + p[t,s] # Equation for movement error
                 }
-            q[s] ~ dgamma(1.0E-3, 1.0E-3)
-            r[s] ~ dgamma(1.0E-3, 1.0E-3)
+            etaprec[s] ~ dgamma(1.0E-3, 1.0E-3) # Prior distribution for the precision etaprec[s]
+            epsilonprec[s] ~ dgamma(1.0E-3, 1.0E-3) # Prior distribution for the precision epsilonprec[s]
             
-            logit(A[s]) <- A1[s]
-            A1[s] ~ dnorm(A1mu, A1prec)
-            logit(B[s]) <- B1[s]
-            B1[s]  ~ dnorm(B1mu, B1prec)
-            x[1,s] ~ dnorm(0.0, 1.0E3)
+            logit(A[s]) <- A1[s] # Logit of A1
+            A1[s] ~ dnorm(A1mu, A1prec) # Prior distribution for A1[s]
+            logit(B[s]) <- B1[s] # Logit of B1
+            B1[s]  ~ dnorm(B1mu, B1prec) # Prior distribution for B1[s]
+            x[1,s] ~ dnorm(0.0, 1.0E3) # Initialization of the first aiming angle at 0
         }
         
-        A1mu ~ dnorm(0.0, 1.0E-3)
-        A1prec ~ dgamma(1.0E-3, 1.0E-3)
-        B1mu ~ dnorm(0.0, 1.0E-3)
-        B1prec ~ dgamma(1.0E-3, 1.0E-3)
+        A1mu ~ dnorm(0.0, 1.0E-3) # Hyperparameter for the mean of A1
+        A1prec ~ dgamma(1.0E-3, 1.0E-3) # Hyperparameter for the precision of A1
+        B1mu ~ dnorm(0.0, 1.0E-3) # Hyperparameter for the mean of B1
+        B1prec ~ dgamma(1.0E-3, 1.0E-3) # Hyperparameter for the precision of B1
 }
