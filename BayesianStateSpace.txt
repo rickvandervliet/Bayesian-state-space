@@ -1,0 +1,23 @@
+model{
+        for(s in 1:NSubjects) {
+                for(t in TrialStart:TrialEnd) {
+                    xmu[t,s] <- A[s] * x[t , s] - v[t,s] * B[s] * u[t,s]
+                    x[t+1,s] ~ dnorm(xmu[t,s], q[s])
+                    y[t,s] ~ dnorm(x[t, s], r[s])
+                    u[t,s] <- y[t,s] + p[t,s];
+                }
+            q[s] ~ dgamma(1.0E-3, 1.0E-3)
+            r[s] ~ dgamma(1.0E-3, 1.0E-3)
+            
+            logit(A[s]) <- A1[s]
+            A1[s] ~ dnorm(A1mu, A1prec)
+            logit(B[s]) <- B1[s]
+            B1[s]  ~ dnorm(B1mu, B1prec)
+            x[1,s] ~ dnorm(0.0, 1.0E3)
+        }
+        
+        A1mu ~ dnorm(0.0, 1.0E-3)
+        A1prec ~ dgamma(1.0E-3, 1.0E-3)
+        B1mu ~ dnorm(0.0, 1.0E-3)
+        B1prec ~ dgamma(1.0E-3, 1.0E-3)
+}
