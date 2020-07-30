@@ -3,23 +3,17 @@ function [samples, stats, structArray] = BayesianStateSpaceModel(aimingError, ro
     NBurnin = 2*10^4;
     NSamples = 5*10^4;
     doparallel = 1;
-    TrialStart = 1;
-    TrialEnd = 900;
-
-    subjects = 1:size(aimingError,2);
-    rotation = rotation(TrialStart:TrialEnd,subjects);
-    showCursor = showCursor(TrialStart:TrialEnd,subjects);
-    aimingError = aimingError(TrialStart:TrialEnd,subjects);
 
     indices = abs(aimingError+rotation)>30;
     aimingError(indices) = NaN;
-
+    NTrials = size(aimingError,1);
+    
     dataStruct = struct('y', aimingError, ...
         'p', rotation,...
         'v', showCursor,...
         'NSubjects', size(aimingError,2),...
-        'TrialStart', TrialStart,...
-        'TrialEnd', TrialEnd);
+        'TrialStart', 1,...
+        'TrialEnd', NTrials);
 
     for i=1:NChains
         S(i).A1mu = 0.5;
@@ -28,14 +22,14 @@ function [samples, stats, structArray] = BayesianStateSpaceModel(aimingError, ro
         S(i).B1mu = 0.5;
         S(i).B1prec = 0.5;
         S(i).B1 = ones(size(aimingError,2),1);
-        S(i).x = [aimingError; aimingError(900,:)];
+        S(i).x = [aimingError; aimingError(NTrials,:)];
         S(i).etaprec = ones(size(aimingError,2),1);
         S(i).epsilonprec = ones(size(aimingError,2),1);
     end;  
 
     [samples, stats, structArray] = matjags( ...
     dataStruct, ...                     % Observed data   
-    fullfile(pwd, 'BayesianStateSpaceFitReachingTotal.txt'), ...    % File that contains model definition
+    fullfile(pwd, 'BayesianStateSpace.txt'), ...    % File that contains model definition
     S, ...                          % Initial values for latent variables
     'doparallel' , doparallel, ...      % Parallelization flag
     'nchains', NChains,...              % Number of MCMC chains
