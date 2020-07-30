@@ -29,7 +29,7 @@ function [samples, stats, structArray] = BayesianStateSpaceModel(aimingError, ro
 
     [samples, stats, structArray] = matjags( ...
     dataStruct, ...                     % Observed data   
-    fullfile(pwd, 'BayesianStateSpace.txt'), ...    % File that contains model definition
+    fullfile(pwd, 'BayesianStateSpaceModel.txt'), ...    % File that contains model definition
     S, ...                          % Initial values for latent variables
     'doparallel' , doparallel, ...      % Parallelization flag
     'nchains', NChains,...              % Number of MCMC chains
